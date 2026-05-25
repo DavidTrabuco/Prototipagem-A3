@@ -1,12 +1,21 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { NavBarStyles as s } from '../../styles/NavBarStyles';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useLogin';
+import { NavBarStyles as s } from './NavBarStyles';
+
+const links = [
+  { to: '/', label: 'Início', icon: '⌂' },
+  { to: '/chatbot', label: 'Tutor', icon: '☰' },
+  { to: '/quiz', label: 'Quiz', icon: '≡' },
+];
 
 export default function Navbar() {
-  const location = useLocation();
   const { logout } = useAuth();
-  
-  const active = location.pathname;
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <nav className={s.wrapper}>
@@ -17,33 +26,26 @@ export default function Navbar() {
           <span className={s.subtitle}>Agente de aprendizado adaptativo</span>
         </div>
       </div>
-      <div className={s.nav}>
-        <Link
-          to="/"
-          className={active === '/' ? s.navButtonActive : s.navButton}
-        >
-          ⌂ Início
-        </Link>
-        <Link
-          to="/tutor"
-          className={active === '/tutor' ? s.navButtonActive : s.navButton}
-        >
-          ☰ Tutor
-        </Link>
-        <Link
-          to="/quiz"
-          className={active === '/quiz' ? s.navButtonActive : s.navButton}
-        >
-          ≡ Quiz
-        </Link>
+      <ul className={s.nav}>
+        {links.map(link => (
+          <li key={link.to}>
+            <NavLink
+              to={link.to}
+              className={({ isActive }) => `${s.navLink} ${isActive ? s.navLinkActive : ''}`}
+            >
+              <span className={s.icon}>{link.icon}</span>
+              <span className={s.label}>{link.label}</span>
+            </NavLink>
+          </li>
+        ))}
         <button
           className={s.navButton}
-          onClick={logout}
+          onClick={handleLogout}
           style={{ color: '#ef4444' }}
         >
           ⎋ Sair
         </button>
-      </div>
+      </ul>
     </nav>
   );
 }

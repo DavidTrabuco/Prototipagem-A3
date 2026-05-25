@@ -1,50 +1,43 @@
-import type { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth, PrivateRoute } from './hooks/useLogin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Onboarding from './pages/Onboarding';
-import ChatPage from './pages/Chat';
-import Quiz from './components/Quiz';
+import Dashboard from './pages/DashboardPages';
+import Login from './pages/LoginPages';
+import Signup from './pages/SignUpPages';
+import Questionario from './pages/QuestionarioPages';
+import Quiz from './pages/QuizPages';
+import ChatPage from './pages/ChatbotPages';
 
-const PrivateRoute = ({ children }: { children: ReactNode }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) return <div className="min-h-screen bg-[#181818] flex items-center justify-center text-white">Carregando...</div>;
-  
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-
-  return <>{children}</>;
-};
-
-const AppContent = () => {
+const AppRoutes = () => {
   const { user } = useAuth();
 
   return (
-    <div style={{ backgroundColor: '#181818', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="h-screen flex flex-col bg-[#181818]">
       {user && <Navbar />}
-      <div style={{ flex: 1 }}>
+      <main className="flex-1 overflow-y-auto">
         <Routes>
-          <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-          <Route path="/signup" element={user ? <Navigate to="/onboarding" /> : <Signup />} />
-          <Route path="/onboarding" element={
+
+          {/* Se ele clicar no botao Inicio  ele sai e vai para o Dashboard  */}
+          <Route path="/" element={!user ? <Login /> : !user.onboarded ? <Navigate to="/questionario" /> : <Navigate to="/dashboard" />} />
+
+          {/* Aqui se ele clicar o sair ele vai para o Login */}
+          <Route path="/login" element={!user ? <Login /> : !user.onboarded ? <Navigate to="/questionario" /> : <Navigate to="/dashboard" />} />
+
+
+          {/* Aqui se ele clicar no cadastrar ,ele vai para o cadastro  */}
+          <Route path="/signup" element={!user ? <Signup /> : !user.onboarded ? <Navigate to="/questionario" /> : <Navigate to="/dashboard" />} />
+
+                    
+
+          <Route path="/questionario" element={
             <PrivateRoute>
-              {user?.onboarded ? <Navigate to="/" /> : <Onboarding />}
+              {user?.onboarded ? <Navigate to="/dashboard" /> : <Questionario />}
             </PrivateRoute>
           } />
-          <Route path="/" element={
+          <Route path="/dashboard" element={
             <PrivateRoute>
-              {!user?.onboarded ? <Navigate to="/onboarding" /> : <Dashboard />}
-            </PrivateRoute>
-          } />
-          <Route path="/tutor" element={
-            <PrivateRoute>
-              <ChatPage />
+              {!user?.onboarded ? <Navigate to="/questionario" /> : <Dashboard />}
             </PrivateRoute>
           } />
           <Route path="/quiz" element={
@@ -52,21 +45,24 @@ const AppContent = () => {
               <Quiz />
             </PrivateRoute>
           } />
+          <Route path="/chatbot" element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          } />
         </Routes>
-      </div>
+      </main>
       {user && <Footer />}
     </div>
   );
 };
 
-function App() {
+export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <AppContent />
+        <AppRoutes />
       </Router>
     </AuthProvider>
   );
 }
-
-export default App;

@@ -1,47 +1,36 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { AuthStyles as s } from '../../styles/AuthStyles';
+import { useAuth } from '../../hooks/useLogin';
+import { LoginStyles as s } from './Login';
+import { NavLink, useNavigate } from 'react-router-dom';
 
-export default function Signup() {
-  const [name, setName] = useState('');
+
+export default function Login() {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { signup } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    const success = await signup({ name, email, password });
+
+    const success = await login(email, password);
     if (success) {
-      navigate('/onboarding');
+      navigate('/dashboard');
     } else {
-      setError('Erro ao criar conta. Tente novamente.');
+      setError('E-mail ou senha inválidos.');
     }
   };
 
   return (
     <div className={s.container}>
       <div className={s.card}>
-        <h1 className={s.title}>Criar Conta</h1>
-        <p className={s.subtitle}>Junte-se ao TutorIA e comece a aprender</p>
+        <h1 className={s.title}>TutorIA</h1>
+        <p className={s.subtitle}>Entre para continuar seus estudos</p>
         
         <form onSubmit={handleSubmit} className={s.form}>
-          <div className={s.inputGroup}>
-            <label className={s.label}>Nome Completo</label>
-            <input
-              type="text"
-              className={s.input}
-              placeholder="Seu nome"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-
           <div className={s.inputGroup}>
             <label className={s.label}>E-mail</label>
             <input
@@ -66,15 +55,15 @@ export default function Signup() {
             />
           </div>
 
-          <button type="submit" className={s.button}>
-            Criar Conta
+          <button type='submit' className={s.button}>
+            Entrar
           </button>
         </form>
 
         {error && <p className={s.error}>{error}</p>}
 
         <p className="text-[#9ca3af] text-center mt-6 text-sm">
-          Já tem uma conta? <Link to="/login" className="text-[#4ade80] hover:underline">Entrar</Link>
+          Não tem uma conta? <NavLink to="/signup" className="text-[#4ade80] hover:underline">Cadastre-se</NavLink>
         </p>
       </div>
     </div>

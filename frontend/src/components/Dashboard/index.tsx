@@ -1,6 +1,6 @@
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useLogin';
 import { useProgress } from '../../hooks/useProgress';
-import { TelaPrincipalStyles as s } from '../../styles/TelaPrincipalStyles';
+import { TelaPrincipalStyles as s } from './DashboardStyles';
 
 const subjectMeta: Record<string, any> = {
   'Algoritmos':                 { label: '</>',  iconBg: '#1a3d2b', iconColor: '#4ade80', barColor: '#4ade80' },
@@ -17,9 +17,8 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { progress, loading } = useProgress();
 
-  if (loading) return <div className="p-8 text-white">Carregando dashboard...</div>;
+  if (loading) return <div className={s.loading}>Carregando dashboard...</div>;
 
-  // Fallback para dados vazios
   const subjects = progress?.subjects || [];
   const streak = progress?.streak || 0;
   const xp = progress?.xp || 0;
@@ -28,20 +27,19 @@ export default function Dashboard() {
 
   return (
     <div className={s.page}>
-      
+
       <div className={s.greetingCard}>
         <div className={s.greetingAvatar}>👤</div>
         <div className={s.greetingContent}>
           <p className={s.greetingTitle}>Olá, {user?.name}! 👋</p>
           <p className={s.greetingSubtitle}>
-            {streak > 0 
-              ? `Você estudou ${streak} dias seguidos. Continue assim!` 
+            {streak > 0
+              ? `Você estudou ${streak} dias seguidos. Continue assim!`
               : "Bem-vindo ao seu primeiro dia de estudos! Vamos começar?"}
           </p>
         </div>
       </div>
 
-     
       <div className={s.statsRow}>
         <div className={s.statCard}>
           <span className={s.statIcon} style={{ color: '#4ade80' }}>🔥</span>
@@ -60,23 +58,22 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Mapa de Habilidades */}
-      <div className="mt-4 p-6 bg-[#252525] rounded-2xl">
-        <p className="text-[#6b7280] text-xs font-bold tracking-widest uppercase mb-4">Mapa de Habilidades</p>
-        <div className="space-y-4">
+      <div className={s.skillsMapCard}>
+        <p className={s.skillsMapTitle}>Mapa de Habilidades</p>
+        <div className={s.skillsMapList}>
           {[
             { name: 'Backend',    val: 70 },
             { name: 'SQL',        val: 50 },
             { name: 'Algoritmos', val: 30 },
             { name: 'IA',         val: 20 },
           ].map(skill => (
-            <div key={skill.name} className="flex items-center gap-4">
-              <span className="text-white text-xs w-20">{skill.name}</span>
-              <div className="flex-1 flex gap-1">
+            <div key={skill.name} className={s.skillRow}>
+              <span className={s.skillName}>{skill.name}</span>
+              <div className={s.skillBars}>
                 {Array.from({ length: 10 }).map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`h-2 flex-1 rounded-sm ${i < skill.val/10 ? 'bg-[#4ade80]' : 'bg-[#333]'}`}
+                  <div
+                    key={i}
+                    className={`${s.skillBar} ${i < skill.val / 10 ? 'bg-[#4ade80]' : 'bg-[#333]'}`}
                   />
                 ))}
               </div>
@@ -84,7 +81,7 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
-      
+
       <div className={s.subjectsSection}>
         <p className={s.sectionHeading}>Matérias</p>
         {subjects.length > 0 ? (
@@ -116,17 +113,17 @@ export default function Dashboard() {
             })}
           </div>
         ) : (
-          <div className="p-8 bg-[#252525] rounded-2xl text-center text-[#9ca3af] text-sm italic">
+          <div className={s.subjectsEmpty}>
             Nenhuma matéria iniciada ainda. Comece pelo Tutor!
           </div>
         )}
       </div>
 
       {difficulties.length > 0 && (
-        <div className="mt-4 p-4 bg-[#2a1a1a] rounded-2xl border border-[#451a1a]">
-          <p className="text-[#f87171] text-xs font-bold uppercase tracking-wider mb-2">Atenção</p>
-          <p className="text-white text-sm">
-            Você está com dificuldade em: <span className="font-semibold">{progress.difficulties.join(', ')}</span>. 
+        <div className={s.difficultiesCard}>
+          <p className={s.difficultiesTitle}>Atenção</p>
+          <p className={s.difficultiesText}>
+            Você está com dificuldade em: <span className="font-semibold">{difficulties.join(', ')}</span>.
             Que tal revisar esses temas hoje?
           </p>
         </div>

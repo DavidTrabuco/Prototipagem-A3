@@ -1,4 +1,4 @@
-import { FooterStyles} from "../../styles/FooterStyles";
+import { FooterStyles} from "./FooterStyles";
 
 export  const integrantes: { nome: string; id: number }[] = [
         { nome: 'David Trabuco', id: 1 },

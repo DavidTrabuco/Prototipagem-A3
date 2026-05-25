@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { OnboardingStyles as s } from '../../styles/OnboardingStyles';
+import { useAuth } from './useLogin';
 
-const STEPS = [
+export const STEPS = [
   {
     id: 'education',
     title: 'Qual seu nível de ensino?',
@@ -75,13 +74,14 @@ const STEPS = [
   }
 ];
 
-export default function Onboarding() {
+export function useQuestionario() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<any>({});
+  const [answers, setAnswers] = useState<Record<string, any>>({});
   const { updateUser } = useAuth();
   const navigate = useNavigate();
 
   const step = STEPS[currentStep];
+  const isLastStep = currentStep === STEPS.length - 1;
 
   const handleSelect = (optionId: string) => {
     if (step.multi) {
@@ -96,7 +96,7 @@ export default function Onboarding() {
   };
 
   const handleNext = async () => {
-    if (currentStep < STEPS.length - 1) {
+    if (!isLastStep) {
       setCurrentStep(prev => prev + 1);
     } else {
       try {
@@ -108,69 +108,33 @@ export default function Onboarding() {
           goal: answers.goal,
           onboarded: true
         });
-        navigate('/');
+        navigate('/dashboard');
       } catch (error) {
         console.error('Erro ao salvar perfil:', error);
       }
     }
   };
 
+  const handleBack = () => setCurrentStep(prev => Math.max(0, prev - 1));
+
   const isSelected = (optionId: string) => {
-    if (step.multi) {
-      return (answers[step.id] || []).includes(optionId);
-    }
+    if (step.multi) return (answers[step.id] || []).includes(optionId);
     return answers[step.id] === optionId;
   };
 
-  const canContinue = step.multi 
-    ? (answers[step.id] || []).length > 0 
+  const canContinue = step.multi
+    ? (answers[step.id] || []).length > 0
     : !!answers[step.id];
 
-  return (
-    <div className={s.container}>
-      <div className={s.card}>
-        <div className={s.stepIndicator}>
-          {STEPS.map((_, i) => (
-            <div 
-              key={i} 
-              className={`${s.stepDot} ${i === currentStep ? s.stepDotActive : s.stepDotInactive}`} 
-            />
-          ))}
-        </div>
-
-        <h1 className={s.title}>{step.title}</h1>
-        <p className={s.description}>{step.description}</p>
-
-        <div className={s.optionsGrid}>
-          {step.options.map(opt => (
-            <button
-              key={opt.id}
-              onClick={() => handleSelect(opt.id)}
-              className={`${s.optionButton} ${isSelected(opt.id) ? s.optionButtonSelected : s.optionButtonUnselected}`}
-            >
-              <span className={s.icon}>{opt.icon}</span>
-              <span className={s.label}>{opt.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className={s.footer}>
-          <button 
-            className={s.backButton}
-            onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
-            style={{ visibility: currentStep === 0 ? 'hidden' : 'visible' }}
-          >
-            Voltar
-          </button>
-          <button
-            className={s.nextButton}
-            disabled={!canContinue}
-            onClick={handleNext}
-          >
-            {currentStep === STEPS.length - 1 ? 'Começar' : 'Próximo'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return {
+    step,
+    currentStep,
+    totalSteps: STEPS.length,
+    isLastStep,
+    canContinue,
+    handleSelect,
+    handleNext,
+    handleBack,
+    isSelected
+  };
 }

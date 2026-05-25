@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import type { ReactNode, FC } from 'react';
+import { Navigate } from 'react-router-dom';
 
 interface User {
   id: number;
@@ -37,20 +38,19 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulando chamada de API com mock data
     try {
-      const response = await fetch('/src/data/mock/users.json');
-      const users = await response.json();
-      
-      const foundUser = users.find((u: any) => u.email === email && u.password === password);
-      
-      if (foundUser) {
-        const { password, ...userWithoutPassword } = foundUser;
-        setUser(userWithoutPassword);
-        localStorage.setItem('@TutorIA:user', JSON.stringify(userWithoutPassword));
-        return true;
-      }
-      return false;
+      const response = await fetch('http://localhost:5001/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) return false;
+
+      const loggedUser = await response.json();
+      setUser(loggedUser);
+      localStorage.setItem('@TutorIA:user', JSON.stringify(loggedUser));
+      return true;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -59,17 +59,15 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const signup = async (userData: any): Promise<boolean> => {
     try {
-      const newUser = {
-        ...userData,
-        id: Date.now(),
-        onboarded: false,
-        xp: 0,
-        level: 1,
-        streak: 0
-      };
-      
-      // No mundo real, faríamos um POST para o backend
-      // Aqui simulamos salvando no localStorage e no estado
+      const response = await fetch('http://localhost:5001/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      if (!response.ok) return false;
+
+      const newUser = await response.json();
       setUser(newUser);
       localStorage.setItem('@TutorIA:user', JSON.stringify(newUser));
       return true;
@@ -107,3 +105,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+export const PrivateRoute = ({ children }: { children: ReactNode }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return <div className="min-h-screen bg-[#181818] flex items-center justify-center text-white">Carregando...</div>;
+  if (!user) return <Navigate to="/login" />;
+
+  return <>{children}</>;
+};

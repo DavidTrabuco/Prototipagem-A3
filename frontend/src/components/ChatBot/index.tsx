@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChatBotStyles as s } from '../../styles/ChatBotStyles'
+import { ChatBotStyles as s } from './ChatBotStyles'
 import { useTutor } from '../../hooks/useTutor'
 
 export default function ChatBot() {

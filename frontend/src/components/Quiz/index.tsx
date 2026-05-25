@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { QuizStyles as s } from '../../styles/QuizStyles';
+import { useAuth } from '../../hooks/useLogin';
+import { QuizStyles as s } from './QuizStyles';
 
 interface Question {
   question: string;
