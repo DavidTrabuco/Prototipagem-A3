@@ -6,9 +6,12 @@ export default function Dashboard() {
 
   if (loading) return <div className={s.loading}>Carregando dashboard...</div>;
 
+
+  //Teste de Conflito
   return (
     //Teste de David 
     <div className={s.page}>
+
 
       <div className={s.greetingCard}>
         <div className={s.greetingAvatar}>👤</div>
