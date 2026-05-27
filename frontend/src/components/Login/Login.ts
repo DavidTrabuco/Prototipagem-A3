@@ -11,5 +11,7 @@ export const LoginStyles = {
   btnOutline: "border-2 border-[#4ade80] text-[#4ade80] hover:bg-[#4ade80] hover:text-[#181818] font-bold px-42 py-3 rounded-xl transition-all active:scale-[0.98]",
   error: "text-red-400 text-sm text-center mt-4",
   fieldError: "text-red-400 text-xs mt-1",
+  errorServer: "flex items-center justify-between mt-4 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl",
+  buttonErrorServer:"text-red-400 hover:text-red-300 ml-3 text-lg leading-none", 
   inputInvalid: "w-full bg-[#1a1a1a] border border-red-500 rounded-xl px-4 py-3 text-white placeholder-[#4b5563] focus:outline-none focus:ring-2 focus:ring-red-500 transition-all",
 }

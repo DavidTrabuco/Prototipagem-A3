@@ -3,7 +3,7 @@ import { LoginStyles as s } from './Login';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const { email, setEmail, password, setPassword, errors, handleSubmit } = useLoginForm();
+  const { email, setEmail, password, setPassword, errors, handleSubmit, fetchError, setFetchError } = useLoginForm();
   const navigate = useNavigate();
 
   return (
@@ -42,6 +42,13 @@ export default function Login() {
             <NavLink to="/">Voltar</NavLink>
           </button>
         </form>
+
+        {fetchError && (
+          <div className={s.errorServer}>
+            <p className={s.error + ' mt-0'}>Servidor indisponivel. Verifique sua conexao e tente novamente.</p>
+            <button onClick={() => setFetchError(false)} className={s.buttonErrorServer}>&times;</button>
+          </div>
+        )}
 
         <p className="text-[#9ca3af] text-center mt-6 text-sm">
           Nao tem uma conta? <NavLink to="/signup" className="text-[#4ade80] hover:underline">Cadastre-se</NavLink>

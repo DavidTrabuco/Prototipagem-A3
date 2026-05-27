@@ -21,6 +21,8 @@ interface AuthContextType {
   updateUser: (data: Partial<User>) => Promise<void>;
   logout: () => void;
   loading: boolean;
+  fetchError: boolean;
+  setFetchError: (v: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -28,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] =useState(false)
 
   useEffect(() => {
     const savedUser = localStorage.getItem('@TutorIA:user');
@@ -53,6 +56,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       return true;
     } catch (error) {
       console.error('Login error:', error);
+      setFetchError(true)
+
       return false;
     }
   };
@@ -98,7 +103,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, updateUser, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, signup, updateUser, logout, loading, fetchError, setFetchError }}>
       {children}
     </AuthContext.Provider>
   );
@@ -110,7 +115,7 @@ export function useLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
-  const { login } = useAuth();
+  const { login, fetchError, setFetchError } = useAuth();
 
   const validar = (): boolean => {
     const next = { email: '', password: '' };
@@ -138,6 +143,7 @@ export function useLoginForm() {
 
   const handleSubmit = async (e: React.FormEvent, onSuccess: () => void) => {
     e.preventDefault();
+    setFetchError(false);
     if (!validar()) return;
 
     const success = await login(email, password);
@@ -148,7 +154,7 @@ export function useLoginForm() {
     }
   };
 
-  return { email, setEmail, password, setPassword, errors, handleSubmit };
+  return { email, setEmail, password, setPassword, errors, handleSubmit, fetchError, setFetchError };
 }
 
 export const PrivateRoute = ({ children }: { children: ReactNode }) => {
