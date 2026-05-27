@@ -32,6 +32,8 @@ const ComoFunciona: Feature[] = [
 
 export default function TelaPrincipal() {
 
+  //Fazendo o arquivo ter conflito para testar 
+
   return (
     <div className={s.container}>
       <div className={s.hero}>
